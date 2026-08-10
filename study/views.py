@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from .models import Study
 
 def index(request):
     return HttpResponse("StudyStack")
@@ -46,4 +47,12 @@ def login_view(request):
 
 @login_required(login_url="/login/")
 def dashboard(request):
-    return render(request, "study/dashboard.html")
+
+    studies = Study.objects.filter(
+        user=request.user
+    ).order_by("-created_at")
+    context = {
+        "studies" : studies
+    }
+
+    return render(request, "study/dashboard.html", context)

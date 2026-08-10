@@ -1,1 +1,13 @@
-<h1>{{user.username}}の学習ページ 🐇</h1>
+<h1>{{ user.username }}の学習ページ 🐇</h1>
+
+{% for study in studies %}
+
+    
+    <p>{{ study.content }}</p>
+    
+
+{% empty %}
+
+    <p>まだ学習記録がないよ！</p>
+
+{% endfor %}
