@@ -1,5 +1,15 @@
 <h1>{{ user.username }}の学習ページ 🐇</h1>
 
+<form method="POST">
+    {% csrf_token %}
+
+        <label>学習内容</label>
+        <input type="text" name="content">
+
+        <button class="add-button" type="submit">登録する</button>
+
+</form>
+
 {% for study in studies %}
 
     

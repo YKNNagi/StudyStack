@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .models import Study
+from .forms import StudyForm
 
 def index(request):
     return HttpResponse("StudyStack")
@@ -51,8 +52,23 @@ def dashboard(request):
     studies = Study.objects.filter(
         user=request.user
     ).order_by("-created_at")
+
+    if request.method == "POST":
+        form = StudyForm(request.POST)
+
+        if form.is_valid():
+            study = form.save(commit=False)
+            study.user = request.user
+            study.save()
+
+            return redirect("dashboard")
+
+    else:
+        form = StudyForm()
+
     context = {
-        "studies" : studies
+        "studies" : studies,
+        "form" : form
     }
 
     return render(request, "study/dashboard.html", context)
