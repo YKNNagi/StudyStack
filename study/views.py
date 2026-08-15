@@ -72,3 +72,27 @@ def dashboard(request):
     }
 
     return render(request, "study/dashboard.html", context)
+
+@login_required(login_url="/login/")
+def update_view(request,study_id):
+
+    study = Study.objects.get(
+        id = study_id,
+        user = request.user
+    )
+
+    if request.method == "POST":
+        form = StudyForm(request.POST, instance=study)
+
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard")
+
+    else:
+            form = StudyForm(instance = study)
+
+    return render(
+        request,
+        "study/update.html",
+        {"form": form}
+    )

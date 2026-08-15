@@ -1,0 +1,9 @@
+<form method="POST">
+    {% csrf_token %}
+
+        <label>学習内容</label>
+        {{ form.content }}
+
+        <button class="add-button" type="submit">更新する</button>
+
+</form>
