@@ -6,4 +6,10 @@
 
         <button class="add-button" type="submit">更新する</button>
 
+        {% if form.content.errors %}
+            <div class="form-error">
+                {{ form.content.errors }}
+            </div>
+        {% endif %}
+
 </form>

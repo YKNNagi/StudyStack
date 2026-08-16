@@ -7,21 +7,27 @@
         <input type="text" name="content">
 
         <button class="add-button" type="submit">登録する</button>
+        
+        {% if form.content.errors %}
+                <div class="form-error">
+                    {{ form.content.errors }}
+                </div>
+        {% endif %}
 
 </form>
 
 {% for study in studies %}
-
     
     <p>{{ study.content }}</p>
+    <a href="{% url 'update' study.id %}">編集</a>
 
-    <form action="{% url 'delete' study.id %}"
-      method="POST"
-      onsubmit="return confirm('本当に削除しますか？');">
-
-    {% csrf_token %}
-    <button type="submit">削除</button>
-
+    <form
+        action="{% url 'delete' study.id %}"
+        method="POST"
+        onsubmit="return confirm('本当に削除しますか？');"
+    >
+        {% csrf_token %}
+        <button type="submit">削除</button>
     </form>
 
 {% empty %}
