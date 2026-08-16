@@ -96,3 +96,16 @@ def update_view(request,study_id):
         "study/update.html",
         {"form": form}
     )
+
+@login_required(login_url="/login/")
+def delete_view(request, study_id):
+
+    study = Study.objects.get(
+            id = study_id,
+            user = request.user
+    )
+
+    if request.method == "POST":
+        study.delete()
+
+    return redirect("dashboard")

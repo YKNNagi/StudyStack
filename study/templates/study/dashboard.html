@@ -14,7 +14,15 @@
 
     
     <p>{{ study.content }}</p>
-    
+
+    <form action="{% url 'delete' study.id %}"
+      method="POST"
+      onsubmit="return confirm('本当に削除しますか？');">
+
+    {% csrf_token %}
+    <button type="submit">削除</button>
+
+    </form>
 
 {% empty %}
 
