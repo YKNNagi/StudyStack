@@ -1,37 +1,487 @@
-<h1>{{ user.username }}の学習ページ 🐇</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<form method="POST">
-    {% csrf_token %}
+    <title>学習ページ | StudyStack</title>
 
-        <label>学習内容</label>
-        <input type="text" name="content">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-        <button class="add-button" type="submit">登録する</button>
-        
-        {% if form.content.errors %}
-                <div class="form-error">
-                    {{ form.content.errors }}
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family:
+                "Hiragino Kaku Gothic ProN",
+                "Yu Gothic",
+                sans-serif;
+
+            color: #625d68;
+
+            background:
+                radial-gradient(
+                    circle at 15% 15%,
+                    rgba(255, 215, 225, 0.6),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at 85% 75%,
+                    rgba(220, 210, 255, 0.55),
+                    transparent 35%
+                ),
+                #fffafb;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 820px;
+
+            margin: 0 auto;
+            padding: 50px 24px 70px;
+
+            animation: fadeUp 0.7s ease-out;
+        }
+
+        /* ヘッダー */
+        .page-header {
+            text-align: center;
+            margin-bottom: 34px;
+        }
+
+        .rabbit {
+            display: inline-block;
+
+            margin-bottom: 6px;
+
+            font-size: 36px;
+
+            animation: rabbitFloat 2.8s ease-in-out infinite;
+        }
+
+        h1 {
+            margin: 0;
+
+            color: #786b7d;
+            font-size: 28px;
+            letter-spacing: 0.06em;
+        }
+
+        .subtitle {
+            margin-top: 9px;
+
+            color: #aaa0ad;
+            font-size: 13px;
+        }
+
+        /* 共通カード */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+
+            border: 1px solid rgba(235, 215, 225, 0.85);
+            border-radius: 22px;
+
+            box-shadow:
+                0 10px 28px rgba(130, 105, 125, 0.1);
+
+            backdrop-filter: blur(8px);
+        }
+
+        /* 新規登録 */
+        .create-card {
+            margin-bottom: 36px;
+            padding: 26px 28px;
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+
+            color: #817487;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .create-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .create-form label {
+            display: none;
+        }
+
+        .create-form input {
+            flex: 1;
+
+            min-width: 0;
+            padding: 12px 14px;
+
+            color: #625d68;
+            font-size: 14px;
+
+            background: white;
+
+            border: 1px solid #e5dce4;
+            border-radius: 13px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .create-form input:focus {
+            border-color: #d7b7c9;
+
+            box-shadow:
+                0 0 0 4px rgba(225, 190, 210, 0.2);
+
+            transform: translateY(-1px);
+        }
+
+        .add-button {
+            flex-shrink: 0;
+
+            padding: 12px 20px;
+
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #d9b6c8,
+                    #c9bce5
+                );
+
+            border: none;
+            border-radius: 13px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 16px rgba(185, 150, 180, 0.2);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .add-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 9px 20px rgba(185, 150, 180, 0.28);
+        }
+
+        .add-button:active {
+            transform: scale(0.98);
+        }
+
+        /* エラー */
+        .form-error {
+            margin-top: 12px;
+
+            color: #b76e79;
+            font-size: 12px;
+
+            background: #fff2f4;
+
+            border-radius: 10px;
+
+            animation: errorAppear 0.3s ease-out;
+        }
+
+        .form-error ul {
+            margin: 0;
+            padding: 9px 14px 9px 30px;
+        }
+
+        /* 学習記録 */
+        .study-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .study-card {
+            padding: 20px 22px;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .study-card:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 14px 30px rgba(130, 105, 125, 0.14);
+        }
+
+        .study-content {
+            margin: 0 0 16px;
+
+            color: #665e69;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .study-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* 編集 */
+        .edit-link {
+            display: inline-block;
+
+            padding: 8px 14px;
+
+            color: #8173a6;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+
+            background: #f1edfb;
+
+            border-radius: 10px;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .edit-link:hover {
+            transform: translateY(-1px);
+            background: #e9e2f8;
+        }
+
+        /* 削除 */
+        .delete-form {
+            margin: 0;
+        }
+
+        .delete-button {
+            padding: 8px 14px;
+
+            color: #b46f7b;
+            font-size: 12px;
+            font-weight: 600;
+
+            background: #fff0f3;
+
+            border: none;
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .delete-button:hover {
+            transform: translateY(-1px);
+            background: #ffe4e9;
+        }
+
+        /* 空データ */
+        .empty-card {
+            padding: 34px;
+            text-align: center;
+        }
+
+        .empty-rabbit {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 30px;
+        }
+
+        .empty-card p {
+            margin: 0;
+
+            color: #aaa0ad;
+            font-size: 14px;
+        }
+
+        /* アニメーション */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes rabbitFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes errorAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-container {
+                padding: 32px 16px 50px;
+            }
+
+            .create-card {
+                padding: 22px 18px;
+            }
+
+            .create-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-button {
+                width: 100%;
+            }
+
+            .study-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="dashboard-container">
+
+        <header class="page-header">
+            <div class="rabbit">🐇</div>
+
+            <h1>{{ user.username }}の学習ページ</h1>
+
+            <p class="subtitle">
+                今日の学びを、ひとつずつ積み重ねよう。
+            </p>
+        </header>
+
+        <!-- 新規登録 -->
+        <section class="card create-card">
+
+            <h2 class="section-title">
+                ✏️ 新しい学習記録
+            </h2>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="create-form">
+                    <label>学習内容</label>
+
+                    <input
+                        type="text"
+                        name="content"
+                        placeholder="今日は何を学んだ？"
+                    >
+
+                    <button
+                        class="add-button"
+                        type="submit"
+                    >
+                        登録する
+                    </button>
                 </div>
-        {% endif %}
 
-</form>
+                {% if form.content.errors %}
+                    <div class="form-error">
+                        {{ form.content.errors }}
+                    </div>
+                {% endif %}
 
-{% for study in studies %}
-    
-    <p>{{ study.content }}</p>
-    <a href="{% url 'update' study.id %}">編集</a>
+            </form>
 
-    <form
-        action="{% url 'delete' study.id %}"
-        method="POST"
-        onsubmit="return confirm('本当に削除しますか？');"
-    >
-        {% csrf_token %}
-        <button type="submit">削除</button>
-    </form>
+        </section>
 
-{% empty %}
+        <!-- 学習記録一覧 -->
+        <section class="study-list">
 
-    <p>まだ学習記録がないよ！</p>
+            {% for study in studies %}
 
-{% endfor %}
+                <article class="card study-card">
+
+                    <p class="study-content">
+                        {{ study.content }}
+                    </p>
+
+                    <div class="study-actions">
+
+                        <a
+                            class="edit-link"
+                            href="{% url 'update' study.id %}"
+                        >
+                            編集
+                        </a>
+
+                        <form
+                            class="delete-form"
+                            action="{% url 'delete' study.id %}"
+                            method="POST"
+                            onsubmit="return confirm('本当に削除しますか？');"
+                        >
+                            {% csrf_token %}
+
+                            <button
+                                class="delete-button"
+                                type="submit"
+                            >
+                                削除
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <div class="card empty-card">
+                    <span class="empty-rabbit">🐇</span>
+
+                    <p>
+                        まだ学習記録がないよ！<br>
+                        今日の学びをひとつ登録してみよう。
+                    </p>
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+</body>
+</html>
