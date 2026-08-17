@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Study
 from .forms import StudyForm
@@ -72,6 +72,14 @@ def dashboard(request):
     }
 
     return render(request, "study/dashboard.html", context)
+
+
+@login_required(login_url="/login/")
+def logout_view(request):
+    logout(request)
+
+    return redirect("login")
+
 
 @login_required(login_url="/login/")
 def update_view(request,study_id):

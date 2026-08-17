@@ -1,276 +1,292 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>ログイン | StudyStack</title>
 
     <style>
-        * {
-            box-sizing: border-box;
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+
+        color: #625d68;
+
+        background:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 215, 225, 0.65),
+            transparent 35%
+          ),
+          radial-gradient(
+            circle at 80% 75%,
+            rgba(220, 210, 255, 0.6),
+            transparent 35%
+          ),
+          #fffafb;
+      }
+
+      /* 全体 */
+      .login-container {
+        width: 100%;
+        max-width: 440px;
+        padding: 24px;
+
+        animation: fadeUp 0.7s ease-out;
+      }
+
+      /* カード */
+      .login-card {
+        padding: 40px 36px;
+
+        background: rgba(255, 255, 255, 0.88);
+
+        border: 1px solid rgba(235, 215, 225, 0.8);
+        border-radius: 26px;
+
+        box-shadow: 0 12px 35px rgba(130, 105, 125, 0.12);
+
+        backdrop-filter: blur(8px);
+      }
+
+      /* タイトル */
+      .title-area {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .rabbit {
+        display: inline-block;
+        margin-bottom: 5px;
+
+        font-size: 34px;
+
+        animation: rabbitFloat 2.8s ease-in-out infinite;
+      }
+
+      h1 {
+        margin: 4px 0 8px;
+
+        color: #786b7d;
+        font-size: 27px;
+        letter-spacing: 0.08em;
+      }
+
+      .subtitle {
+        margin: 0;
+
+        color: #aaa0ad;
+        font-size: 13px;
+      }
+
+      /* Django form.as_p */
+      form p {
+        margin: 0 0 20px;
+      }
+
+      form label {
+        display: block;
+        margin-bottom: 7px;
+
+        color: #807583;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      form input {
+        width: 100%;
+        padding: 12px 14px;
+
+        color: #625d68;
+        font-size: 15px;
+
+        background: #fff;
+
+        border: 1px solid #e5dce4;
+        border-radius: 13px;
+
+        outline: none;
+
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      form input:focus {
+        border-color: #d7b7c9;
+
+        box-shadow: 0 0 0 4px rgba(225, 190, 210, 0.2);
+
+        transform: translateY(-1px);
+      }
+
+      /* エラー */
+      .errorlist {
+        margin: 6px 0 14px;
+        padding: 9px 12px;
+
+        list-style: none;
+
+        color: #b76e79;
+        font-size: 12px;
+
+        background: #fff2f4;
+        border-radius: 10px;
+
+        animation: errorAppear 0.3s ease-out;
+      }
+
+      /* ログインボタン */
+      button {
+        width: 100%;
+
+        margin-top: 8px;
+        padding: 13px 18px;
+
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+
+        background: linear-gradient(135deg, #d9b6c8, #c9bce5);
+
+        border: none;
+        border-radius: 14px;
+
+        cursor: pointer;
+
+        box-shadow: 0 7px 18px rgba(185, 150, 180, 0.22);
+
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+
+        box-shadow: 0 10px 22px rgba(185, 150, 180, 0.28);
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .signup-link {
+        display: block;
+        width: fit-content;
+
+        margin: 18px auto 0;
+        padding: 7px 13px;
+
+        color: #8f8395;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+
+        background: rgba(245, 239, 250, 0.85);
+
+        border: 1px solid #ebe2ef;
+        border-radius: 999px;
+
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .signup-link:hover {
+        color: #7c6d8b;
+        background: #f0e8f7;
+        transform: translateY(-1px);
+      }
+
+      .signup-link:active {
+        transform: scale(0.98);
+      }
+
+      /* アニメーション */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
         }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-            font-family:
-                "Hiragino Kaku Gothic ProN",
-                "Yu Gothic",
-                sans-serif;
-
-            color: #625d68;
-
-            background:
-                radial-gradient(
-                    circle at 20% 20%,
-                    rgba(255, 215, 225, 0.65),
-                    transparent 35%
-                ),
-                radial-gradient(
-                    circle at 80% 75%,
-                    rgba(220, 210, 255, 0.6),
-                    transparent 35%
-                ),
-                #fffafb;
+      @keyframes rabbitFloat {
+        0%,
+        100% {
+          transform: translateY(0);
         }
 
-        /* 全体 */
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      @keyframes errorAppear {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 520px) {
         .login-container {
-            width: 100%;
-            max-width: 440px;
-            padding: 24px;
-
-            animation: fadeUp 0.7s ease-out;
+          padding: 16px;
         }
 
-        /* カード */
         .login-card {
-            padding: 40px 36px;
-
-            background: rgba(255, 255, 255, 0.88);
-
-            border: 1px solid rgba(235, 215, 225, 0.8);
-            border-radius: 26px;
-
-            box-shadow:
-                0 12px 35px rgba(130, 105, 125, 0.12);
-
-            backdrop-filter: blur(8px);
+          padding: 32px 24px;
         }
-
-        /* タイトル */
-        .title-area {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .rabbit {
-            display: inline-block;
-            margin-bottom: 5px;
-
-            font-size: 34px;
-
-            animation: rabbitFloat 2.8s ease-in-out infinite;
-        }
-
-        h1 {
-            margin: 4px 0 8px;
-
-            color: #786b7d;
-            font-size: 27px;
-            letter-spacing: 0.08em;
-        }
-
-        .subtitle {
-            margin: 0;
-
-            color: #aaa0ad;
-            font-size: 13px;
-        }
-
-        /* Django form.as_p */
-        form p {
-            margin: 0 0 20px;
-        }
-
-        form label {
-            display: block;
-            margin-bottom: 7px;
-
-            color: #807583;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        form input {
-            width: 100%;
-            padding: 12px 14px;
-
-            color: #625d68;
-            font-size: 15px;
-
-            background: #fff;
-
-            border: 1px solid #e5dce4;
-            border-radius: 13px;
-
-            outline: none;
-
-            transition:
-                border-color 0.2s ease,
-                box-shadow 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        form input:focus {
-            border-color: #d7b7c9;
-
-            box-shadow:
-                0 0 0 4px rgba(225, 190, 210, 0.2);
-
-            transform: translateY(-1px);
-        }
-
-        /* エラー */
-        .errorlist {
-            margin: 6px 0 14px;
-            padding: 9px 12px;
-
-            list-style: none;
-
-            color: #b76e79;
-            font-size: 12px;
-
-            background: #fff2f4;
-            border-radius: 10px;
-
-            animation: errorAppear 0.3s ease-out;
-        }
-
-        /* ログインボタン */
-        button {
-            width: 100%;
-
-            margin-top: 8px;
-            padding: 13px 18px;
-
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #d9b6c8,
-                    #c9bce5
-                );
-
-            border: none;
-            border-radius: 14px;
-
-            cursor: pointer;
-
-            box-shadow:
-                0 7px 18px rgba(185, 150, 180, 0.22);
-
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 10px 22px rgba(185, 150, 180, 0.28);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        /* アニメーション */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes rabbitFloat {
-            0%, 100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-5px);
-            }
-        }
-
-        @keyframes errorAppear {
-            from {
-                opacity: 0;
-                transform: translateY(-4px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 520px) {
-            .login-container {
-                padding: 16px;
-            }
-
-            .login-card {
-                padding: 32px 24px;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <main class="login-container">
+      <section class="login-card">
+        <div class="title-area">
+          <div class="rabbit">🐇</div>
 
-        <section class="login-card">
+          <h1>StudyStack</h1>
 
-            <div class="title-area">
-                <div class="rabbit">🐇</div>
+          <p class="subtitle">おかえりなさい。今日も少しずつ。</p>
+        </div>
 
-                <h1>StudyStack</h1>
+        <form method="POST">
+          {% csrf_token %} 
+          
+          {{ form.as_p }}
 
-                <p class="subtitle">
-                    おかえりなさい。今日も少しずつ。
-                </p>
-            </div>
+          <button type="submit">ログイン</button>
+        </form>
 
-            <form method="POST">
-                {% csrf_token %}
-
-                {{ form.as_p }}
-
-                <button type="submit">
-                    ログイン
-                </button>
-            </form>
-
-        </section>
-
+        <a class="signup-link" href="{% url 'signup' %}">
+          はじめての方はこちら 🐇
+        </a>
+      </section>
     </main>
-
-</body>
+  </body>
 </html>

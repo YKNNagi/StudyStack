@@ -218,6 +218,35 @@
             transform: scale(0.98);
         }
 
+        .login-link {
+            display: block;
+            width: fit-content;
+
+            margin: 18px auto 0;
+            padding: 7px 13px;
+
+            color: #8f8395;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+
+            background: rgba(245, 239, 250, 0.85);
+
+            border: 1px solid #ebe2ef;
+            border-radius: 999px;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .login-link:hover {
+            color: #7c6d8b;
+            background: #f0e8f7;
+            transform: translateY(-1px);
+        }
+
         /* アニメーション */
         @keyframes fadeUp {
             from {
@@ -290,6 +319,9 @@
                     登録する
                 </button>
             </form>
+            <a class="login-link" href="{% url 'login' %}">
+                ← ログイン画面に戻る
+            </a>
 
         </section>
 

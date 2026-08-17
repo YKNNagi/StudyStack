@@ -77,6 +77,51 @@
             font-size: 13px;
         }
 
+        /* ログアウト */
+        .logout-form {
+            margin-top: 18px;
+        }
+
+        .logout-button {
+            padding: 8px 16px;
+
+            color: #8f7b8b;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+
+            background: rgba(255, 255, 255, 0.75);
+
+            border: 1px solid #eadde5;
+            border-radius: 999px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 5px 14px rgba(150, 120, 145, 0.1);
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+            }
+
+        .logout-button:hover {
+            color: #a76f85;
+
+            background: #fff3f6;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 18px rgba(170, 125, 150, 0.16);
+            }
+
+        .logout-button:active {
+            transform: scale(0.97);
+            }
+
         /* 共通カード */
         .card {
             background: rgba(255, 255, 255, 0.9);
@@ -379,14 +424,29 @@
     <main class="dashboard-container">
 
         <header class="page-header">
-            <div class="rabbit">🐇</div>
+    <div class="rabbit">🐇</div>
 
-            <h1>{{ user.username }}の学習ページ</h1>
+    <h1>{{ user.username }}の学習ページ</h1>
 
-            <p class="subtitle">
-                今日の学びを、ひとつずつ積み重ねよう。
-            </p>
-        </header>
+    <p class="subtitle">
+        今日の学びを、ひとつずつ積み重ねよう。
+    </p>
+
+    <form
+        class="logout-form"
+        action="{% url 'logout' %}"
+        method="POST"
+    >
+        {% csrf_token %}
+
+        <button
+            class="logout-button"
+            type="submit"
+        >
+            ログアウト
+        </button>
+    </form>
+</header>
 
         <!-- 新規登録 -->
         <section class="card create-card">
