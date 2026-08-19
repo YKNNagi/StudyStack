@@ -2,6 +2,7 @@ from django.test import TestCase
 from .models import Study
 from django.contrib.auth import get_user_model
 from .forms import StudyForm
+from django.urls import reverse
 
 # Create your tests here.
 
@@ -94,4 +95,25 @@ class StudyModelTest(TestCase):
 
          self.assertEqual(study.content, "Pythonを勉強する")
 
-        
+class StudyViewTest(TestCase):
+     def setUp(self):
+        User = get_user_model()
+
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="testpass"
+        )
+
+     def test_login_success(self):
+          logged_in = self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+          self.assertTrue(logged_in)
+          
+
+     def test_dashboard_requires_login(self):
+          response = self.client.get(
+                reverse("dashboard")
+          )
