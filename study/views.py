@@ -18,9 +18,6 @@ def signup(request):
 
         if form.is_valid():
             form.save()
-
-        else:
-            print(form.errors)
         
     else:
 
