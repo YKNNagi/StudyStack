@@ -120,6 +120,11 @@ class StudyViewTest(TestCase):
             password="testpass"
         )
 
+        self.other_user = User.objects.create_user(
+            username="otheruser",
+            password="otherpass"
+        )
+
 
     # 正しいユーザー名・パスワードでログインできることを確認
     def test_login_success(self):
@@ -170,7 +175,7 @@ class StudyViewTest(TestCase):
             username="newuser"
         )
 
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 3)
 
 
     # パスワードが一致しない場合、Signupに失敗しユーザーが追加されないことを確認
@@ -186,7 +191,7 @@ class StudyViewTest(TestCase):
 
         User = get_user_model()
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
 
 
     # ログアウト後は未認証状態となり、DashboardへアクセスするとLoginへ戻されることを確認
@@ -209,4 +214,75 @@ class StudyViewTest(TestCase):
 
 
     # 次：ログインユーザーには自分のStudyだけが表示されることを確認
-    # def test_dashboard_shows_only_own_studies(self):
+    def test_dashboard_shows_only_own_studies(self):
+        Study.objects.create(
+            content="Pythonを勉強する",
+            user=self.user
+        )
+
+        Study.objects.create(
+            content="Javaを勉強する",
+            user=self.other_user
+        )
+
+        self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+        response = self.client.get(
+            reverse("dashboard")
+        )
+
+        # 自分のStudyは表示される
+        self.assertContains(
+            response,
+            "Pythonを勉強する"
+        )
+
+        # 他ユーザーのStudyは表示されない
+        self.assertNotContains(
+            response,
+            "Javaを勉強する"
+        )
+
+        self.assertContains(response, "Python")
+
+    # 他ユーザーのStudyは更新されない
+    def test_cannot_update_other_users_study(self):
+        other_study = Study.objects.create(
+            content="Javaを勉強する",
+            user=self.other_user
+        )
+
+        self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+        response = self.client.get(
+            reverse("update", args=[other_study.id])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    # 他ユーザーのStudyは削除されない
+    def test_cannot_delete_other_users_study(self):
+        other_study = Study.objects.create(
+            content="Javaを勉強する",
+            user=self.other_user
+        )
+
+        self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+        response = self.client.post(
+            reverse("delete", args=[other_study.id])
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(
+            Study.objects.filter(id=other_study.id).exists()
+        )

@@ -6,6 +6,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Study
 from .forms import StudyForm
+from django.shortcuts import render, redirect, get_object_or_404
 
 def index(request):
     return HttpResponse("StudyStack")
@@ -81,9 +82,10 @@ def logout_view(request):
 @login_required(login_url="/login/")
 def update_view(request,study_id):
 
-    study = Study.objects.get(
-        id = study_id,
-        user = request.user
+    study = get_object_or_404(
+        Study,
+        id=study_id,
+        user=request.user
     )
 
     if request.method == "POST":
@@ -105,9 +107,10 @@ def update_view(request,study_id):
 @login_required(login_url="/login/")
 def delete_view(request, study_id):
 
-    study = Study.objects.get(
-            id = study_id,
-            user = request.user
+    study = get_object_or_404(
+        Study,
+        id=study_id,
+        user=request.user
     )
 
     if request.method == "POST":
