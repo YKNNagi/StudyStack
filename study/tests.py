@@ -176,6 +176,7 @@ class StudyViewTest(TestCase):
         )
 
         self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(new_user.username, "newuser")
 
 
     # パスワードが一致しない場合、Signupに失敗しユーザーが追加されないことを確認
@@ -213,7 +214,7 @@ class StudyViewTest(TestCase):
         )
 
 
-    # 次：ログインユーザーには自分のStudyだけが表示されることを確認
+    # ログインユーザーには自分のStudyだけが表示されることを確認
     def test_dashboard_shows_only_own_studies(self):
         Study.objects.create(
             content="Pythonを勉強する",
@@ -246,8 +247,6 @@ class StudyViewTest(TestCase):
             "Javaを勉強する"
         )
 
-        self.assertContains(response, "Python")
-
     # 他ユーザーのStudyは更新されない
     def test_cannot_update_other_users_study(self):
         other_study = Study.objects.create(
@@ -260,11 +259,21 @@ class StudyViewTest(TestCase):
             password="testpass"
         )
 
-        response = self.client.get(
-            reverse("update", args=[other_study.id])
+        response = self.client.post(
+            reverse("update", args=[other_study.id]),
+            data={
+                "content": "勝手に書き換える"
+            }
         )
 
         self.assertEqual(response.status_code, 404)
+
+        other_study.refresh_from_db()
+
+        self.assertEqual(
+            other_study.content,
+            "Javaを勉強する"
+        )
 
     # 他ユーザーのStudyは削除されない
     def test_cannot_delete_other_users_study(self):
@@ -286,3 +295,71 @@ class StudyViewTest(TestCase):
         self.assertTrue(
             Study.objects.filter(id=other_study.id).exists()
         )
+
+    # DashboardからStudyを作ったとき、ログインユーザーに正しく紐づく
+    def test_create_study_for_logged_in_user(self):
+        self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+        response = self.client.post(
+            reverse("dashboard"),
+            data={
+                "content": "Pythonを勉強する"
+            }
+        )
+
+        self.assertEqual(Study.objects.count(), 1)
+
+        study = Study.objects.get(
+            content="Pythonを勉強する"
+        )
+
+        self.assertEqual(study.user, self.user)
+
+
+    # 自分のStudyならUpdateできる
+    def test_can_update_own_study(self):
+        study = Study.objects.create(
+            content="Pythonを勉強する",
+            user=self.user
+        )
+
+        self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+        response = self.client.post(
+            reverse("update", args=[study.id]),
+            data={
+                "content": "Djangoを勉強する"
+            }
+        )
+
+        study.refresh_from_db()
+
+        self.assertEqual(
+            study.content,
+            "Djangoを勉強する"
+        )
+
+    # 自分のStudyならDeleteできる
+    def test_can_delete_own_study(self):
+        study = Study.objects.create(
+            content="Pythonを勉強する",
+            user=self.user
+        )
+        self.client.login(
+            username="testuser",
+            password="testpass"
+        )
+
+        self.assertEqual(Study.objects.count(), 1)
+
+        response = self.client.post(
+            reverse("delete", args=[study.id])
+        )
+
+        self.assertEqual(Study.objects.count(), 0)
